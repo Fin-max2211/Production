@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO & Meta Tags -->
+    <title>What's Your TU Life | Porter TU Party</title>
+    <meta name="description" content="ค้นหา TU Life Style ของคุณ! ตอบคำถามแล้วดูว่าชีวิตในธรรมศาสตร์ของคุณเป็นแบบไหน" />
+    <meta name="author" content="Porter TU Party" />
+    <meta property="og:title" content="What's Your TU Life" />
+    <meta property="og:description" content="ค้นหาสไตล์ชีวิตธรรมศาสตร์ของคุณ!" />
+    <meta property="og:type" content="website" />
+    <!-- 📸 PLACEHOLDER: ใส่รูป OG สำหรับ share ลง social -->
+    <!-- <meta property="og:image" content="assets/images/og-cover.jpg" /> -->
+
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
+
+    <!-- Google Fonts: IBM Plex Sans Thai Looped + Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai+Looped:wght@100;200;300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+
+    <link rel="stylesheet" href="css/style.css?v=14" />
+</head>
+
+<body>
+
+    <div class="phone-frame" id="phone-frame">
+
+        <!-- ============================== -->
+        <!-- Background Decoration (Crosses) -->
+        <!-- ============================== -->
+        <div class="deco-layer" aria-hidden="true">
+        </div>
+
+        <!-- ========== PAGE 1: COVER ========== -->
+        <section class="screen active" id="page-cover" aria-label="Cover Page">
+            <div class="screen-inner cover-layout">
+
+                <!-- Sound button — floats top right -->
+                <button class="cover-sound-btn mute-btn" aria-label="Toggle Sound">
+                    <img src="assets/icon/turn-on.png" alt="Sound" class="sound-icon-img" id="sound-icon-cover">
+                </button>
+
+                <!-- Logo — centered at top -->
+                <div class="cover-logo-area">
+                    <img src="assets/images/partner.png" alt="Partner TU Party" class="logo-img" id="img-logo">
+                    <span class="logo-fallback" id="fallback-logo">Partner</span>
+                </div>
+
+                <!-- Hero Title Image — takes up most space -->
+                <div class="cover-hero">
+                    <img src="assets/images/Presented by.png" alt="What's Your TU Life" class="cover-hero-img"
+                        id="img-hero">
+                    <div class="cover-hero-fallback" id="fallback-hero">
+                        <h1>What's Your<br>TU Life</h1>
+                    </div>
+                </div>
+
+                <!-- Form — input + START in one card -->
+                <div class="cover-form">
+                    <div class="cover-form-card">
+                        <input type="text" class="name-input" id="input-username" placeholder="Please Enter Your Name"
+                            maxlength="30" autocomplete="off" />
+                        <p class="error-msg" id="error-username" aria-live="polite"></p>
+                        <button class="btn-start" id="btn-start">START!</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========== PAGE 2: QUESTION ========== -->
+        <section class="screen" id="page-question" aria-label="Question Page">
+            <div class="screen-inner">
+                <div class="q-top-bar">
+                    <div class="q-left">
+                        <!--
+                            📸 PLACEHOLDER #3: ไอคอนเครื่องหมายคำถาม
+                            ไฟล์: assets/images/question-icon.png
+                            ขนาดแนะนำ: 40x40px, PNG
+                        -->
+                        <img src="assets/images/question-icon.png" alt="?" class="q-icon-img" id="img-qicon">
+                        <span class="q-icon-fallback" id="fallback-qicon">❓</span>
+                        <span class="q-badge" id="q-counter">1/10</span>
+                    </div>
+                    <button class="sound-btn mute-btn" aria-label="Toggle Sound">
+                        <img src="assets/icon/turn-on.png" alt="Sound" class="sound-icon-img" id="sound-icon-q">
+                    </button>
+                </div>
+
+                <div class="q-card">
+                    <div class="q-card-emoji" id="q-card-emoji" style="display:none;"></div>
+                    <p class="q-text" id="q-text">Loading question...</p>
+                </div>
+
+                <p class="q-prompt" id="q-prompt">คุณจะ...</p>
+
+                <div class="q-options" id="q-options" role="group" aria-label="Answer Options">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== PAGE 3: REVEAL ========== -->
+        <section class="screen" id="page-reveal" aria-label="Reveal Page">
+            <div class="screen-inner">
+                <div class="reveal-badge-wrap">
+                    <span class="reveal-badge" id="reveal-counter">1/10</span>
+                </div>
+                <p class="reveal-sub" id="reveal-subtitle">ชีวิตธรรมศาสตร์ในแบบของคุณต้อง...</p>
+                <h2 class="reveal-answer" id="reveal-item-name">Answer</h2>
+                <div class="reveal-emoji" id="reveal-item-img">📦</div>
+                <div class="reveal-desc-card">
+                    <p class="reveal-desc" id="reveal-item-desc">Description</p>
+                </div>
+
+                <p class="reveal-extra-text" id="reveal-extra-text"></p>
+                <div class="reveal-spacer"></div>
+                <button class="btn-reveal-next" id="btn-next-q">NEXT</button>
+            </div>
+        </section>
+
+        <!-- ========== PAGE 4: PERSONALITY RESULT ========== -->
+        <section class="screen" id="page-summary" aria-label="Result Page">
+            <div class="screen-inner result-layout">
+                <p class="result-subtitle" id="result-subtitle">ชีวิตในธรรมศาสตร์ของคุณ คือ...</p>
+                <h2 class="result-title" id="result-title">ชาวโดมปล่อยจอย</h2>
+                <div class="result-emoji" id="result-emoji">🦋</div>
+                <p class="result-desc" id="result-desc">Description</p>
+                <p class="result-item-label" id="result-item-label">ไอเทมที่ควรพกติดตัวไว้คือ...</p>
+                <div class="result-spacer"></div>
+                <div class="result-item-emoji" id="result-item-emoji">💊</div>
+                <h3 class="result-item-name" id="result-item-name">ยาดม 2 รู</h3>
+                <p class="result-item-desc" id="result-item-desc">Item description</p>
+                <div class="result-spacer"></div>
+                <button class="btn-summary-next" id="btn-summary-next">Next ➡️</button>
+            </div>
+        </section>
+
+        <!-- ========== PAGE 5: SUGGEST ========== -->
+        <section class="screen" id="page-suggest" aria-label="Suggest Page">
+            <div class="screen-inner">
+                <div class="sug-icon">💬</div>
+                <h2 class="sug-title">อยากบอกอะไรเราบ้าง?</h2>
+                <p class="sug-desc">ข้อเสนอแนะของคุณมีค่ามาก!<br>Suggest something for us!</p>
+                <textarea class="sug-textarea" id="input-suggestion" placeholder="พิมพ์ข้อเสนอแนะที่นี่..." rows="4"
+                    maxlength="500"></textarea>
+                <div class="sug-spacer"></div>
+                <button class="btn-submit" id="btn-submit-suggest">Submit</button>
+
+            </div>
+        </section>
+
+        <!-- ========== PAGE 6: FINAL ========== -->
+        <section class="screen" id="page-final" aria-label="Thank You Page">
+            <div class="screen-inner">
+                <div class="final-spacer-top"></div>
+                <h2 class="final-thx">THX!</h2>
+                <div class="final-emoji">🎉</div>
+                <p class="final-desc">ขอบคุณที่ร่วมสนุกกับเรา!<br>Thank you for playing!</p>
+                <div class="final-card" id="final-summary-card"></div>
+
+                <div class="final-spacer"></div>
+
+            </div>
+        </section>
+
+    </div><!-- end phone-frame -->
+
+    <script src="js/data.js?v=5"></script>
+    <script src="js/app.js?v=5"></script>
+
+</body>
+
+</html>
