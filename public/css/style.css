@@ -1138,7 +1138,7 @@ body {
     .reveal-spacer,
     .result-spacer,
     .sug-spacer {
-        flex: 0.56;
+        flex: 0.8;
     }
 }
 
