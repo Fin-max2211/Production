@@ -111,6 +111,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // ปุ่ม Download Result as JPG
+    var btnDownload = document.getElementById('btn-summary-download');
+    if (btnDownload) {
+        btnDownload.addEventListener('click', function () {
+            downloadResultAsJPG();
+        });
+    }
+
     // ปุ่ม Submit Suggestion
     var btnSubmitSuggest = document.getElementById('btn-submit-suggest');
     if (btnSubmitSuggest) {
@@ -543,6 +551,51 @@ function renderSummary() {
     document.getElementById('result-item-desc').textContent = result.itemDesc;
 
     console.log('[RESULT] Personality scores:', JSON.stringify(personalityScores), '=> Type:', maxType);
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// DOWNLOAD RESULT AS JPG
+// ══════════════════════════════════════════════════════════════
+function downloadResultAsJPG() {
+    var btn = document.getElementById('btn-summary-download');
+    if (!btn || btn.classList.contains('downloading')) return;
+
+    btn.classList.add('downloading');
+
+    var targetEl = document.querySelector('#page-summary .result-layout');
+    if (!targetEl) {
+        btn.classList.remove('downloading');
+        return;
+    }
+
+    // Hide buttons during capture
+    var btnGroup = targetEl.querySelector('.result-btn-group');
+    if (btnGroup) btnGroup.style.display = 'none';
+
+    html2canvas(targetEl, {
+        backgroundColor: '#dce6f5',
+        scale: 2,
+        useCORS: true,
+        logging: false
+    }).then(function (canvas) {
+        // Restore buttons
+        if (btnGroup) btnGroup.style.display = '';
+
+        // Convert to JPG and download
+        var link = document.createElement('a');
+        var safeName = userName.replace(/[^a-zA-Z0-9ก-๙]/g, '_') || 'result';
+        link.download = 'TU_Life_' + safeName + '.jpg';
+        link.href = canvas.toDataURL('image/jpeg', 0.92);
+        link.click();
+
+        btn.classList.remove('downloading');
+    }).catch(function (err) {
+        console.error('[Download Error]', err);
+        if (btnGroup) btnGroup.style.display = '';
+        btn.classList.remove('downloading');
+        alert('ดาวน์โหลดไม่สำเร็จ กรุณาลองใหม่');
+    });
 }
 
 

@@ -756,7 +756,7 @@ body {
     font-size: 14px;
     font-weight: 400;
     color: #3a5a8a;
-    margin-bottom: 4px;
+    margin-bottom: 24px;
     animation: fadeIn 0.4s ease both;
 }
 
@@ -875,6 +875,64 @@ body {
 
 .btn-summary-next:hover {
     transform: translateY(-2px);
+}
+
+/* Button group — Next + Download side by side */
+.result-btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    animation: slideUp 0.4s ease both;
+    animation-delay: 0.65s;
+}
+
+.result-btn-group .btn-summary-next {
+    animation: none;
+}
+
+.btn-summary-download {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #3a6ad8, #1a3f9e);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s;
+    box-shadow: 0 4px 15px rgba(26, 63, 158, 0.35);
+    flex-shrink: 0;
+}
+
+.btn-summary-download:hover {
+    transform: translateY(-2px);
+}
+
+.btn-summary-download:active {
+    transform: scale(0.95);
+}
+
+.btn-summary-download.downloading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.btn-summary-download.downloading svg {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 
