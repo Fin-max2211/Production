@@ -1133,6 +1133,13 @@ body {
     .final-thx {
         font-size: 44px;
     }
+
+    /* ปุ่ม Next ขยับขึ้นมา — ลด spacer */
+    .reveal-spacer,
+    .result-spacer,
+    .sug-spacer {
+        flex: 0.3;
+    }
 }
 
 @media (min-width: 481px) and (max-width: 768px) {

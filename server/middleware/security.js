@@ -56,7 +56,7 @@ function setupSecurity(app) {
                 // JavaScript: อนุญาตไฟล์ของเราและ inline scripts
                 // ⚠️ 'unsafe-inline' จำเป็นสำหรับ POC
                 // ตอน production จริง ให้ใช้ nonce-based CSP แทน
-                scriptSrc: ["'self'", "'unsafe-inline'"],
+                scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
 
                 // รูปภาพ: อนุญาตจาก origin ของเรา + data URIs (สำหรับ favicon emoji)
                 imgSrc: ["'self'", "data:", "blob:"],
