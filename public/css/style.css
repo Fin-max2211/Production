@@ -473,9 +473,10 @@ body {
 
 .q-icon-fallback {
     position: absolute;
-    left: -20px;
-    font-size: 34px;
+    left: -30px;
+    font-size: 54px;
     z-index: 2;
+    transform: rotate(22.5deg);
 }
 
 .q-badge {
