@@ -21,6 +21,11 @@ var isInSubQuestion = false;
 var subQuestionData = null;
 var parentSelectionIndex = -1;
 
+// Background Music
+// 📝 เปลี่ยน path เพลงได้ที่นี่ (รองรับ .mp3, .ogg, .wav)
+var BGM_PATH = 'assets/audio/Filo Starquez - Park Vibes (freetouse.com).mp3';
+var bgAudio = null;
+
 // ══════════════════════════════════════════════════════════════
 // THEME CONSTANTS
 // ══════════════════════════════════════════════════════════════
@@ -86,6 +91,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Setup image fallbacks (CSP-safe)
     setupImageFallbacks();
+
+    // 🎵 เริ่มเล่นเพลงทันทีที่โหลดหน้าเว็บ
+    // ถ้า browser บล็อก autoplay → เล่นอัตโนมัติเมื่อผู้ใช้คลิก/แตะครั้งแรก
+    startBGM();
+    function onFirstInteraction() {
+        startBGM();
+        document.removeEventListener('click', onFirstInteraction);
+        document.removeEventListener('touchstart', onFirstInteraction);
+    }
+    document.addEventListener('click', onFirstInteraction);
+    document.addEventListener('touchstart', onFirstInteraction);
 
     // ปุ่ม START (cover page มี input + start รวมกัน)
     var btnStart = document.getElementById('btn-start');
@@ -178,6 +194,15 @@ function toggleMute() {
     icons.forEach(function (el) {
         el.src = iconSrc;
     });
+
+    // ควบคุมเพลง background
+    if (bgAudio) {
+        if (isMuted) {
+            bgAudio.pause();
+        } else {
+            bgAudio.play().catch(function () { });
+        }
+    }
 }
 
 
@@ -238,8 +263,31 @@ function submitName() {
     selectedAnswers = [];
     personalityScores = { C: 0, P: 0, F: 0, L: 0 };
 
+    // เริ่มเล่นเพลง background ตอนกด START
+    startBGM();
+
     renderQuestion();
     goTo('page-question');
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// BACKGROUND MUSIC
+// ══════════════════════════════════════════════════════════════
+function startBGM() {
+    if (isMuted) return;
+
+    // สร้าง Audio element ถ้ายังไม่มี
+    if (!bgAudio) {
+        bgAudio = new Audio(BGM_PATH);
+        bgAudio.loop = true;      // เล่นวนซ้ำ
+        bgAudio.volume = 0.4;     // ความดัง 40% (ปรับได้)
+    }
+
+    bgAudio.currentTime = 0;
+    bgAudio.play().catch(function (err) {
+        console.log('[BGM] Cannot autoplay:', err.message);
+    });
 }
 
 
