@@ -103,13 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ปุ่ม Summary Next
-    var btnSummaryNext = document.getElementById('btn-summary-next');
-    if (btnSummaryNext) {
-        btnSummaryNext.addEventListener('click', function () {
-            goTo('page-suggest');
-        });
-    }
+    // (ลบปุ่ม Summary Next แล้ว — Summary เป็นหน้าสุดท้าย)
 
     // ปุ่ม Download Result as JPG
     var btnDownload = document.getElementById('btn-summary-download');
@@ -449,13 +443,9 @@ function selectAnswer(optionIndex) {
         extraTextEl.style.display = 'none';
     }
 
-    // Next button text
+    // Next button text — ทุกข้อเป็น NEXT เสมอ (รวมข้อสุดท้าย)
     var nextBtn = document.getElementById('btn-next-q');
-    if (currentQuestion >= QUESTIONS.length - 1) {
-        nextBtn.textContent = 'ดูผลลัพธ์ 🎉';
-    } else {
-        nextBtn.textContent = 'NEXT';
-    }
+    nextBtn.textContent = 'NEXT';
 
     // Reset sub-question state before navigating
     isInSubQuestion = false;
@@ -475,8 +465,8 @@ function nextQuestion() {
         renderQuestion();
         goTo('page-question');
     } else {
-        renderSummary();
-        goTo('page-summary');
+        // คำถามครบแล้ว → ไปหน้า Suggestion ก่อนดูผลลัพธ์
+        goTo('page-suggest');
     }
 }
 
@@ -563,23 +553,48 @@ function downloadResultAsJPG() {
 
     btn.classList.add('downloading');
 
-    var targetEl = document.querySelector('#page-summary .result-layout');
-    if (!targetEl) {
+    var layoutEl = document.querySelector('#page-summary .result-layout');
+    if (!layoutEl) {
         btn.classList.remove('downloading');
         return;
     }
 
     // Hide buttons during capture
-    var btnGroup = targetEl.querySelector('.result-btn-group');
+    var btnGroup = layoutEl.querySelector('.result-btn-group');
     if (btnGroup) btnGroup.style.display = 'none';
 
-    html2canvas(targetEl, {
+    // ─── Fix 1: backdrop-filter + transparent bg ───
+    // html2canvas ไม่รองรับ backdrop-filter → ใส่ background ทึบชั่วคราว
+    var origBg = layoutEl.style.background;
+    var origBackdrop = layoutEl.style.backdropFilter;
+    var origWebkitBackdrop = layoutEl.style.webkitBackdropFilter;
+    layoutEl.style.background = 'linear-gradient(180deg, #e8eef8 0%, #d4dff2 50%, #c5d5ed 100%)';
+    layoutEl.style.backdropFilter = 'none';
+    layoutEl.style.webkitBackdropFilter = 'none';
+
+    // ─── Fix 2: ปิด CSS Animations ทั้งหมด ───
+    // html2canvas clone DOM → animation restart จาก opacity:0 → เนื้อหาหายหมด
+    // ต้องปิด animation ก่อน capture
+    layoutEl.style.animation = 'none';
+    var allChildren = layoutEl.querySelectorAll('*');
+    allChildren.forEach(function (el) {
+        el.style.animation = 'none';
+    });
+
+    html2canvas(layoutEl, {
         backgroundColor: '#dce6f5',
         scale: 2,
         useCORS: true,
         logging: false
     }).then(function (canvas) {
-        // Restore buttons
+        // Restore ทุกอย่าง
+        layoutEl.style.background = origBg;
+        layoutEl.style.backdropFilter = origBackdrop;
+        layoutEl.style.webkitBackdropFilter = origWebkitBackdrop;
+        layoutEl.style.animation = '';
+        allChildren.forEach(function (el) {
+            el.style.animation = '';
+        });
         if (btnGroup) btnGroup.style.display = '';
 
         // Convert to JPG and download
@@ -592,6 +607,14 @@ function downloadResultAsJPG() {
         btn.classList.remove('downloading');
     }).catch(function (err) {
         console.error('[Download Error]', err);
+        // Restore styles on error too
+        layoutEl.style.background = origBg;
+        layoutEl.style.backdropFilter = origBackdrop;
+        layoutEl.style.webkitBackdropFilter = origWebkitBackdrop;
+        layoutEl.style.animation = '';
+        allChildren.forEach(function (el) {
+            el.style.animation = '';
+        });
         if (btnGroup) btnGroup.style.display = '';
         btn.classList.remove('downloading');
         alert('ดาวน์โหลดไม่สำเร็จ กรุณาลองใหม่');
@@ -600,12 +623,12 @@ function downloadResultAsJPG() {
 
 
 // ══════════════════════════════════════════════════════════════
-// SUBMIT SUGGESTION
+// SUBMIT SUGGESTION → ส่งข้อมูลทั้งหมด + suggestion → ไปหน้า Summary
 // ══════════════════════════════════════════════════════════════
 function submitSuggestion() {
     var suggestion = document.getElementById('input-suggestion').value.trim();
 
-    // Determine personality result to include in submission
+    // Determine personality result
     var maxType = 'C';
     var maxCount = 0;
     var typeKeys = ['C', 'P', 'F', 'L'];
@@ -629,7 +652,7 @@ function submitSuggestion() {
 
     var submitBtn = document.getElementById('btn-submit-suggest');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'กำลังส่ง...';
+    submitBtn.textContent = 'กำลังโหลด...';
 
     fetch('/api/submit', {
         method: 'POST',
@@ -639,86 +662,19 @@ function submitSuggestion() {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success) {
-                renderFinal();
-                goTo('page-final');
+                console.log('[API] ✅ Data saved successfully');
+                renderSummary();
+                goTo('page-summary');
             } else {
                 alert('เกิดข้อผิดพลาด: ' + (data.message || 'กรุณาลองใหม่'));
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit';
+                submitBtn.textContent = 'ดูผลลัพธ์ 🎉';
             }
         })
         .catch(function (error) {
             console.error('[API Error]', error);
             alert('ไม่สามารถเชื่อมต่อ Server ได้ กรุณาลองใหม่');
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit';
+            submitBtn.textContent = 'ดูผลลัพธ์ 🎉';
         });
-}
-
-
-// ══════════════════════════════════════════════════════════════
-// FINAL PAGE
-// ══════════════════════════════════════════════════════════════
-function renderFinal() {
-    var card = document.getElementById('final-summary-card');
-    var topItems = collectedItems.slice(0, 5);
-    card.textContent = '';
-
-    var labelDiv = document.createElement('div');
-    labelDiv.className = 'label';
-    labelDiv.style.marginBottom = '8px';
-    labelDiv.style.color = 'rgba(255,255,255,0.5)';
-    labelDiv.style.fontSize = '13px';
-    labelDiv.textContent = '🎒 ' + userName + "'s Starter Pack";
-    card.appendChild(labelDiv);
-
-    var emojiRow = document.createElement('div');
-    emojiRow.style.cssText = 'display:flex;justify-content:center;gap:10px;font-size:28px;margin:10px 0;flex-wrap:wrap;';
-    topItems.forEach(function (item) {
-        var span = document.createElement('span');
-        span.textContent = item.img;
-        emojiRow.appendChild(span);
-    });
-    card.appendChild(emojiRow);
-
-    var countP = document.createElement('p');
-    countP.style.cssText = 'font-size:13px;color:rgba(255,255,255,0.5);';
-    countP.textContent = collectedItems.length + ' items collected';
-    card.appendChild(countP);
-
-
-
-    // Confetti!
-    spawnConfetti();
-}
-
-
-// ══════════════════════════════════════════════════════════════
-// CONFETTI
-// ══════════════════════════════════════════════════════════════
-function spawnConfetti() {
-    var frame = document.getElementById('phone-frame');
-    var colors = [
-        '#e74c3c', '#f39c12', '#2ecc71', '#3498db',
-        '#9b59b6', '#e67e22', '#1abc9c', '#fd79a8'
-    ];
-
-    for (var i = 0; i < 50; i++) {
-        var piece = document.createElement('div');
-        piece.className = 'confetti-piece';
-        piece.style.left = (Math.random() * 100) + '%';
-        piece.style.top = '-10px';
-        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.animationDelay = (Math.random() * 2) + 's';
-        piece.style.animationDuration = (2 + Math.random() * 2) + 's';
-        piece.style.width = (6 + Math.random() * 10) + 'px';
-        piece.style.height = (6 + Math.random() * 10) + 'px';
-        frame.appendChild(piece);
-
-        (function (el) {
-            setTimeout(function () {
-                if (el.parentNode) el.parentNode.removeChild(el);
-            }, 5000);
-        })(piece);
-    }
 }
